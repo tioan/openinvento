@@ -1,0 +1,17 @@
+[
+  {
+    "check": "first login",
+    "ok": true,
+    "detail": "user=alice name=Alice Keycloak email=alice@example.test"
+  },
+  {
+    "check": "no local password",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "check": "second login reuses account",
+    "ok": true,
+    "detail": "alice"
+  }
+]

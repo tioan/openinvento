@@ -1,0 +1,55 @@
+== runtime: /run/current-system/sw/bin/podman
+== build openinvento image
+703b879d38738acb82ad0d924a197666b2e312f972c743d280501e1f69d4bc22
+== build runner image
+64982b56ef7f9b24301ec2e800d327d4f7b52c831c646ad1d668949510f714fc
+== start pocket-id
+pocket-id is up
+pocket-id user and client created
+== start openinvento and caddy
+== OIDC login 1 through https://inventory.test
+OK   pocket-id one-time login 200
+OK   config {"enabled":true,"button_label":"Pocket ID","auto_redirect":false,"local_login_enabled":false}
+OK   authenticate redirects to provider http://pocketid.test:1411/authorize
+OK   redirect_uri uses APP_URL https://inventory.test/api/oidc/callback/
+OK   PKCE S256 
+OK   interaction step consent 200
+OK   provider redirects to callback https://inventory.test/api/oidc/callback/
+OK   callback logs in /app
+OK   session user=alice has_password=False
+== OIDC login 2 through https://inventory.test
+OK   pocket-id one-time login 200
+OK   config {"enabled":true,"button_label":"Pocket ID","auto_redirect":false,"local_login_enabled":false}
+OK   authenticate redirects to provider http://pocketid.test:1411/authorize
+OK   redirect_uri uses APP_URL https://inventory.test/api/oidc/callback/
+OK   PKCE S256 
+OK   provider redirects to callback https://inventory.test/api/oidc/callback/
+OK   callback logs in /app
+OK   session user=alice has_password=False
+== OIDC login 3 through https://inventory.test
+OK   pocket-id one-time login 200
+OK   config {"enabled":true,"button_label":"Pocket ID","auto_redirect":false,"local_login_enabled":false}
+OK   authenticate redirects to provider http://pocketid.test:1411/authorize
+OK   redirect_uri uses APP_URL https://inventory.test/api/oidc/callback/
+OK   PKCE S256 
+OK   provider redirects to callback https://inventory.test/api/oidc/callback/
+OK   callback logs in /app
+OK   session user=alice has_password=False
+== front-channel attacks (code injection, login CSRF)
+OK   code injection is rejected /auth/login?error=sso
+OK   victim stays logged out 
+OK   foreign callback link is rejected /auth/login?error=sso
+OK   victim is not logged in as attacker 
+OK   legitimate callback still works /app
+== local login rules
+OK   password login alice: 403 (expected 403)
+OK   password login breakglass: 200 (expected 200)
+OK   config {"enabled":true,"button_label":"Pocket ID","auto_redirect":false,"local_login_enabled":false}
+== discovery requests from openinvento (one per gunicorn worker at most): 0
+== discovery requests total: 4
+== app log (oidc/errors):
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying account_auth.0012_oidc_identity... OK
+23:11:57 | [33mWARNING[0m  | account_auth.oidc | OIDC login failed: Get Token Error (url: http://pocketid.test:1411/api/oidc/token, status: 400, body: {"error":"invalid_grant","error_description":"The provided authorization grant (e.g., authorization code, resource owner credentials) or refresh token is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client. The PKCE code challenge did not match the code verifier."})
+== DONE
+exit 0

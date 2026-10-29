@@ -1,0 +1,38 @@
+{
+  "info": {
+    "_id": "5UBNTpb9t2czWpr",
+    "testId": "5UBNTpb9t2czWpr",
+    "testName": "oidcc-client-test-idtoken-sig-rs256",
+    "variant": {
+      "client_auth_type": "client_secret_basic",
+      "request_type": "plain_http_request",
+      "response_type": "code",
+      "response_mode": "default",
+      "client_registration": "static_client"
+    },
+    "started": "2026-10-29T23:04:45.640860287Z",
+    "config": {
+      "alias": "openinvento",
+      "description": "openinvento OIDC login (PR for openinvento#19)",
+      "client": {
+        "client_id": "openinvento",
+        "client_secret": "(redacted test value)",
+        "redirect_uri": "https://inventory.test/api/oidc/callback/"
+      },
+      "waitTimeoutSeconds": 10
+    },
+    "description": "openinvento OIDC login (PR for openinvento#19)",
+    "alias": "openinvento",
+    "owner": {
+      "sub": "developer",
+      "iss": "https://developer.com"
+    },
+    "planId": "qWnv4RcX94Yak",
+    "status": "FINISHED",
+    "version": "5.3.4",
+    "summary": "The client is expected to accept an id_token signed using RS256. Corresponds to rp-id_token-sig-rs256 test in the old test suite.",
+    "publish": null,
+    "result": "PASSED"
+  },
+  "findings": []
+}

@@ -1,0 +1,45 @@
+{
+  "info": {
+    "_id": "R5xto1e6N4mpCYl",
+    "testId": "R5xto1e6N4mpCYl",
+    "testName": "oidcc-client-test-discovery-jwks-uri-keys",
+    "variant": {
+      "client_auth_type": "client_secret_basic",
+      "request_type": "plain_http_request",
+      "response_type": "code",
+      "response_mode": "default",
+      "client_registration": "static_client"
+    },
+    "started": "2026-10-29T23:07:06.315941749Z",
+    "config": {
+      "alias": "openinvento",
+      "description": "openinvento OIDC login (PR for openinvento#19)",
+      "client": {
+        "client_id": "openinvento",
+        "client_secret": "(redacted test value)",
+        "redirect_uri": "https://inventory.test/api/oidc/callback/"
+      },
+      "waitTimeoutSeconds": 10
+    },
+    "description": "openinvento OIDC login (PR for openinvento#19)",
+    "alias": "openinvento",
+    "owner": {
+      "sub": "developer",
+      "iss": "https://developer.com"
+    },
+    "planId": "Dds4MAFRqRhUt",
+    "status": "FINISHED",
+    "version": "5.3.4",
+    "summary": "The client is expected to retrieve OpenID Provider Configuration Information and send a request to jwks_uri obtained from OP configuration.The jwks_uri endpoint changes every execution and retrieving the configuration is a requirement.Corresponds to rp-discovery-jwks_uri-keys test in the old test suite.",
+    "publish": null,
+    "result": "FAILED"
+  },
+  "findings": [
+    {
+      "src": "oidcc-client-test-discovery-jwks-uri-keys",
+      "result": "FAILURE",
+      "msg": "Illegal test state change: FINISHED -> RUNNING",
+      "requirements": null
+    }
+  ]
+}

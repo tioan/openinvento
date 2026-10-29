@@ -1,0 +1,27 @@
+[
+  {
+    "check": "request failed",
+    "ok": true,
+    "detail": "GET https://claims.test/cb?state=93zuXCkTdzRT3AkuW--VzQ&session_state=_3Pq-iNXzFIYTnkAPErkgiEe&iss=https%3A%2F%2Fkeycloak.test%2Frealms%2Ftest&code=c991b2e1-e4ec-93c3-6226-d85277d994c1._3Pq-iNXzFIYTnkAPErkgiEe.03a44d28-fc5e-424c-8539-2724248fed95 -> net::ERR_SSL_PROTOCOL_ERROR"
+  },
+  {
+    "check": "authorization response captured",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "check": "state echoed",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "check": "token response",
+    "ok": true,
+    "detail": "200"
+  },
+  {
+    "check": "claims recorded",
+    "ok": true,
+    "detail": "/work/out/keycloak/claims.json"
+  }
+]

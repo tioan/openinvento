@@ -1,0 +1,32 @@
+[
+  {
+    "check": "pocket-id one-time login",
+    "ok": true,
+    "detail": "200"
+  },
+  {
+    "check": "request failed",
+    "ok": true,
+    "detail": "GET https://claims.test/cb?code=pocket_id_ac_TwqL9jjfTPOVakpCRJKeic2Zg75Jec1esdOHFuw4rOE.4R0DdCPCmla73TfJqCv6yLa5p7ho81bRKLlEh_Io6bU&iss=https%3A%2F%2Fpocketid.test&scope=openid+profile+email&state=w0Dd6Z4IQasW17MVjTq1Fw -> net::ERR_SSL_PROTOCOL_ERROR"
+  },
+  {
+    "check": "authorization response captured",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "check": "state echoed",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "check": "token response",
+    "ok": true,
+    "detail": "200"
+  },
+  {
+    "check": "claims recorded",
+    "ok": true,
+    "detail": "/work/out/pocketid/claims.json"
+  }
+]

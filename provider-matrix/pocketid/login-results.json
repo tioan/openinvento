@@ -1,0 +1,27 @@
+[
+  {
+    "check": "pocket-id one-time login",
+    "ok": true,
+    "detail": "200"
+  },
+  {
+    "check": "request failed",
+    "ok": true,
+    "detail": "HEAD https://pocketid.test/api/application-images/background -> net::ERR_ABORTED"
+  },
+  {
+    "check": "first login",
+    "ok": true,
+    "detail": "user=alice name=Alice Pocket email=alice@example.test"
+  },
+  {
+    "check": "no local password",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "check": "second login reuses account",
+    "ok": true,
+    "detail": "alice"
+  }
+]

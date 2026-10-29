@@ -1,0 +1,91 @@
+{
+  "authorization_response_iss": "https://pocketid.test",
+  "authorization_response_params": [
+    "code",
+    "iss",
+    "scope",
+    "state"
+  ],
+  "id_token_claims": {
+    "amr": [
+      "otp"
+    ],
+    "at_hash": "DPx9k2cLQe7ua6fcgqQ_sg",
+    "aud": [
+      "1f802749-ee25-44b4-8b48-2fa962e5f95e"
+    ],
+    "auth_time": 1793315409,
+    "display_name": "",
+    "email": "alice@example.test",
+    "email_verified": true,
+    "exp": 1793319010,
+    "family_name": "Pocket",
+    "given_name": "Alice",
+    "iat": 1793315410,
+    "iss": "https://pocketid.test",
+    "jti": "5e61875c-de4c-482f-b1af-ce838cf18181",
+    "name": "Alice Pocket",
+    "nonce": "6HNluiIoYNrrNFFEu4mxYA",
+    "picture": "https://pocketid.test/api/users/1874578e-e26e-4a85-9b15-051ce577a795/profile-picture.png",
+    "preferred_username": "alice",
+    "rat": 1793315409,
+    "sub": "1874578e-e26e-4a85-9b15-051ce577a795",
+    "type": "id-token"
+  },
+  "id_token_header": {
+    "alg": "RS256",
+    "kid": "c9nBixzXKHg",
+    "typ": "JWT"
+  },
+  "issuer": "https://pocketid.test",
+  "metadata": {
+    "authorization_response_iss_parameter_supported": true,
+    "claims_supported": [
+      "sub",
+      "given_name",
+      "family_name",
+      "name",
+      "display_name",
+      "email",
+      "email_verified",
+      "preferred_username",
+      "picture",
+      "groups",
+      "auth_time",
+      "amr"
+    ],
+    "code_challenge_methods_supported": [
+      "plain",
+      "S256"
+    ],
+    "end_session_endpoint": "https://pocketid.test/api/oidc/end-session",
+    "id_token_signing_alg_values_supported": [
+      "RS256"
+    ],
+    "scopes_supported": [
+      "openid",
+      "profile",
+      "email",
+      "groups",
+      "offline_access"
+    ],
+    "token_endpoint_auth_methods_supported": [
+      "client_secret_basic",
+      "client_secret_post",
+      "none"
+    ]
+  },
+  "token_type": "bearer",
+  "userinfo": {
+    "display_name": "",
+    "email": "alice@example.test",
+    "email_verified": true,
+    "family_name": "Pocket",
+    "given_name": "Alice",
+    "name": "Alice Pocket",
+    "picture": "https://pocketid.test/api/users/1874578e-e26e-4a85-9b15-051ce577a795/profile-picture.png",
+    "preferred_username": "alice",
+    "sub": "1874578e-e26e-4a85-9b15-051ce577a795"
+  },
+  "userinfo_content_type": "application/json; charset=utf-8"
+}

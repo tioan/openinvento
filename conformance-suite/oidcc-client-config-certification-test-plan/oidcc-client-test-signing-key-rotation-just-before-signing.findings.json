@@ -1,0 +1,38 @@
+{
+  "info": {
+    "_id": "t9Ds0LwkJrRTBMV",
+    "testId": "t9Ds0LwkJrRTBMV",
+    "testName": "oidcc-client-test-signing-key-rotation-just-before-signing",
+    "variant": {
+      "client_auth_type": "client_secret_basic",
+      "request_type": "plain_http_request",
+      "response_type": "code",
+      "response_mode": "default",
+      "client_registration": "static_client"
+    },
+    "started": "2026-10-29T23:08:05.493329238Z",
+    "config": {
+      "alias": "openinvento",
+      "description": "openinvento OIDC login (PR for openinvento#19)",
+      "client": {
+        "client_id": "openinvento",
+        "client_secret": "(redacted test value)",
+        "redirect_uri": "https://inventory.test/api/oidc/callback/"
+      },
+      "waitTimeoutSeconds": 10
+    },
+    "description": "openinvento OIDC login (PR for openinvento#19)",
+    "alias": "openinvento",
+    "owner": {
+      "sub": "developer",
+      "iss": "https://developer.com"
+    },
+    "planId": "Dds4MAFRqRhUt",
+    "status": "FINISHED",
+    "version": "5.3.4",
+    "summary": "The client is expected to request an ID token and verify its signature by fetching keys from the jwks endpoint. Keys will be rotated right before signing the id_token so the client needs to refetch the jwks to validate the signature.Corresponds to rp-key-rotation-op-sign-key-native test in the old test suite.",
+    "publish": null,
+    "result": "PASSED"
+  },
+  "findings": []
+}

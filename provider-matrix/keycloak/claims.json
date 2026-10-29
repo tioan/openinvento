@@ -1,0 +1,108 @@
+{
+  "authorization_response_iss": "https://keycloak.test/realms/test",
+  "authorization_response_params": [
+    "code",
+    "iss",
+    "session_state",
+    "state"
+  ],
+  "id_token_claims": {
+    "acr": "1",
+    "at_hash": "V4oHLTMjz4cH_cg_GabZ7g",
+    "aud": "openinvento",
+    "auth_time": 1793315431,
+    "azp": "openinvento",
+    "email": "alice@example.test",
+    "email_verified": true,
+    "exp": 1793315732,
+    "family_name": "Keycloak",
+    "given_name": "Alice",
+    "iat": 1793315432,
+    "iss": "https://keycloak.test/realms/test",
+    "jti": "77e5e800-8a31-1ff7-cce1-0fcffc7b4d65",
+    "name": "Alice Keycloak",
+    "nonce": "SVN1ObyhzZsBJerSO3y8Eg",
+    "preferred_username": "alice",
+    "sid": "_3Pq-iNXzFIYTnkAPErkgiEe",
+    "sub": "6adb3359-0c38-4f8c-9bc6-7b372b10d818",
+    "typ": "ID"
+  },
+  "id_token_header": {
+    "alg": "RS256",
+    "kid": "jRUS3x5hCI3rvokja4vy15iawNzNVWoTZkNo-RFq-gI",
+    "typ": "JWT"
+  },
+  "issuer": "https://keycloak.test/realms/test",
+  "metadata": {
+    "authorization_response_iss_parameter_supported": true,
+    "claims_supported": [
+      "iss",
+      "sub",
+      "aud",
+      "exp",
+      "iat",
+      "auth_time",
+      "name",
+      "given_name",
+      "family_name",
+      "preferred_username",
+      "email",
+      "acr",
+      "azp",
+      "nonce"
+    ],
+    "code_challenge_methods_supported": [
+      "plain",
+      "S256"
+    ],
+    "end_session_endpoint": "https://keycloak.test/realms/test/protocol/openid-connect/logout",
+    "id_token_signing_alg_values_supported": [
+      "PS384",
+      "RS384",
+      "EdDSA",
+      "ES384",
+      "HS256",
+      "HS512",
+      "ES256",
+      "RS256",
+      "HS384",
+      "ES512",
+      "PS256",
+      "PS512",
+      "RS512"
+    ],
+    "scopes_supported": [
+      "openid",
+      "microprofile-jwt",
+      "basic",
+      "email",
+      "acr",
+      "address",
+      "phone",
+      "profile",
+      "organization",
+      "offline_access",
+      "roles",
+      "web-origins",
+      "service_account"
+    ],
+    "token_endpoint_auth_methods_supported": [
+      "private_key_jwt",
+      "client_secret_basic",
+      "client_secret_post",
+      "tls_client_auth",
+      "client_secret_jwt"
+    ]
+  },
+  "token_type": "Bearer",
+  "userinfo": {
+    "email": "alice@example.test",
+    "email_verified": true,
+    "family_name": "Keycloak",
+    "given_name": "Alice",
+    "name": "Alice Keycloak",
+    "preferred_username": "alice",
+    "sub": "6adb3359-0c38-4f8c-9bc6-7b372b10d818"
+  },
+  "userinfo_content_type": "application/json"
+}

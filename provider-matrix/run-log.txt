@@ -1,0 +1,66 @@
+== build images
+== start caddy
+== start providers
+pocket-id user and client created
+== provider pocketid
+OK   [pocketid] pocket-id one-time login 200
+NET  [pocketid] HEAD https://pocketid.test/api/application-images/background -> net::ERR_ABORTED
+OK   [pocketid] first login user=alice name=Alice Pocket email=alice@example.test
+OK   [pocketid] no local password 
+OK   [pocketid] second login reuses account alice
+OK   [pocketid] pocket-id one-time login 200
+NET  [pocketid] GET https://claims.test/cb?code=pocket_id_ac_TwqL9jjfTPOVakpCRJKeic2Zg75Jec1esdOHFuw4rOE.4R0DdCPCmla73TfJqCv6yLa5p7ho81bRKLlEh_Io6bU&iss=https%3A%2F%2Fpocketid.test&scope=openid+profile+email&state=w0Dd6Z4IQasW17MVjTq1Fw -> net::ERR_SSL_PROTOCOL_ERROR
+OK   [pocketid] authorization response captured 
+OK   [pocketid] state echoed 
+OK   [pocketid] token response 200
+OK   [pocketid] claims recorded /work/out/pocketid/claims.json
+== app log pocketid (oidc/errors):
+10.89.78.2 - - [29/Oct/2026:23:09:47 +0000] "GET /assets/index-BByjoZRq.js HTTP/1.1" 200 1747443 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:09:47 +0000] "GET /assets/index-B7J9LJEq.css HTTP/1.1" 200 102477 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:09:47 +0000] "GET /registerSW.js HTTP/1.1" 200 134 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:09:47 +0000] "GET /sw.js HTTP/1.1" 200 1561 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:09:47 +0000] "GET /api/me/ HTTP/1.1" 200 35 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+127.0.0.1 - - [29/Oct/2026:23:09:47 +0000] "GET /api/me/ HTTP/1.1" 200 35 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:09:47 +0000] "GET /api/instance-settings/ HTTP/1.1" 403 58 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+127.0.0.1 - - [29/Oct/2026:23:09:47 +0000] "GET /api/instance-settings/ HTTP/1.1" 403 58 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+== provider keycloak
+OK   [keycloak] first login user=alice name=Alice Keycloak email=alice@example.test
+OK   [keycloak] no local password 
+OK   [keycloak] second login reuses account alice
+NET  [keycloak] GET https://claims.test/cb?state=93zuXCkTdzRT3AkuW--VzQ&session_state=_3Pq-iNXzFIYTnkAPErkgiEe&iss=https%3A%2F%2Fkeycloak.test%2Frealms%2Ftest&code=c991b2e1-e4ec-93c3-6226-d85277d994c1._3Pq-iNXzFIYTnkAPErkgiEe.03a44d28-fc5e-424c-8539-2724248fed95 -> net::ERR_SSL_PROTOCOL_ERROR
+OK   [keycloak] authorization response captured 
+OK   [keycloak] state echoed 
+OK   [keycloak] token response 200
+OK   [keycloak] claims recorded /work/out/keycloak/claims.json
+== app log keycloak (oidc/errors):
+10.89.78.2 - - [29/Oct/2026:23:10:28 +0000] "GET /assets/index-BByjoZRq.js HTTP/1.1" 200 1747443 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:10:28 +0000] "GET /assets/index-B7J9LJEq.css HTTP/1.1" 200 102477 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:10:28 +0000] "GET /registerSW.js HTTP/1.1" 200 134 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:10:28 +0000] "GET /sw.js HTTP/1.1" 200 1561 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:10:28 +0000] "GET /api/me/ HTTP/1.1" 200 35 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+127.0.0.1 - - [29/Oct/2026:23:10:28 +0000] "GET /api/me/ HTTP/1.1" 200 35 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:10:28 +0000] "GET /api/instance-settings/ HTTP/1.1" 403 58 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+127.0.0.1 - - [29/Oct/2026:23:10:28 +0000] "GET /api/instance-settings/ HTTP/1.1" 403 58 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+== provider dex
+NET  [dex] POST https://dex.test/dex/auth/local/login?back=&state=snp7okpzoqlxtodoxe4ela2d6 -> net::ERR_NETWORK_CHANGED
+FAIL [dex] known provider page chrome-error://chromewebdata/
+RETRY [dex] TimeoutError at chrome-error://chromewebdata/
+OK   [dex] first login user=alice name=alice email=alice@example.test
+OK   [dex] no local password 
+OK   [dex] second login reuses account alice
+NET  [dex] GET https://claims.test/cb?code=mxn7q73xp2diynm34ifnqcgte&state=eYtAmczBHi4Yh5E3CUWejg -> net::ERR_SSL_PROTOCOL_ERROR
+OK   [dex] authorization response captured 
+OK   [dex] state echoed 
+OK   [dex] token response 200
+OK   [dex] claims recorded /work/out/dex/claims.json
+== app log dex (oidc/errors):
+10.89.78.2 - - [29/Oct/2026:23:11:23 +0000] "GET /registerSW.js HTTP/1.1" 200 134 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:11:23 +0000] "GET /assets/index-B7J9LJEq.css HTTP/1.1" 200 102477 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:11:23 +0000] "GET /assets/index-BByjoZRq.js HTTP/1.1" 200 1747443 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:11:23 +0000] "GET /sw.js HTTP/1.1" 200 1561 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36"
+127.0.0.1 - - [29/Oct/2026:23:11:23 +0000] "GET /api/me/ HTTP/1.1" 200 35 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:11:23 +0000] "GET /api/me/ HTTP/1.1" 200 35 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+10.89.78.2 - - [29/Oct/2026:23:11:23 +0000] "GET /api/instance-settings/ HTTP/1.1" 403 58 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+127.0.0.1 - - [29/Oct/2026:23:11:23 +0000] "GET /api/instance-settings/ HTTP/1.1" 403 58 "https://inventory.test/auth/login?error=sso" "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36"
+== DONE status=1
+exit 1

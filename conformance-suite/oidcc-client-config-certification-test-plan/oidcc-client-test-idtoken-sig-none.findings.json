@@ -1,0 +1,38 @@
+{
+  "info": {
+    "_id": "rG6dmoAfVnW5lJP",
+    "testId": "rG6dmoAfVnW5lJP",
+    "testName": "oidcc-client-test-idtoken-sig-none",
+    "variant": {
+      "client_auth_type": "client_secret_basic",
+      "request_type": "plain_http_request",
+      "response_type": "code",
+      "response_mode": "default",
+      "client_registration": "static_client"
+    },
+    "started": "2026-10-29T23:07:43.474076965Z",
+    "config": {
+      "alias": "openinvento",
+      "description": "openinvento OIDC login (PR for openinvento#19)",
+      "client": {
+        "client_id": "openinvento",
+        "client_secret": "(redacted test value)",
+        "redirect_uri": "https://inventory.test/api/oidc/callback/"
+      },
+      "waitTimeoutSeconds": 10
+    },
+    "description": "openinvento OIDC login (PR for openinvento#19)",
+    "alias": "openinvento",
+    "owner": {
+      "sub": "developer",
+      "iss": "https://developer.com"
+    },
+    "planId": "Dds4MAFRqRhUt",
+    "status": "FINISHED",
+    "version": "5.3.4",
+    "summary": "The client can either accept the unsigned id_token obtained using code flow and send a userinfo request to complete the test or reject the unsigned id_token and stop without sending a userinfo request. If a userinfo request is not received then the test will transition into 'skipped'' state after a timeout. Corresponds to rp-id_token-sig-none test in the old test suite.",
+    "publish": null,
+    "result": "SKIPPED"
+  },
+  "findings": []
+}

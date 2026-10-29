@@ -1,0 +1,27 @@
+[
+  {
+    "check": "request failed",
+    "ok": true,
+    "detail": "GET https://claims.test/cb?code=mxn7q73xp2diynm34ifnqcgte&state=eYtAmczBHi4Yh5E3CUWejg -> net::ERR_SSL_PROTOCOL_ERROR"
+  },
+  {
+    "check": "authorization response captured",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "check": "state echoed",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "check": "token response",
+    "ok": true,
+    "detail": "200"
+  },
+  {
+    "check": "claims recorded",
+    "ok": true,
+    "detail": "/work/out/dex/claims.json"
+  }
+]

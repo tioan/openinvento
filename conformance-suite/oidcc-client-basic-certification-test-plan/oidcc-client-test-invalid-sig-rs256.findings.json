@@ -1,0 +1,38 @@
+{
+  "info": {
+    "_id": "Qea6MjpQTk6zaZM",
+    "testId": "Qea6MjpQTk6zaZM",
+    "testName": "oidcc-client-test-invalid-sig-rs256",
+    "variant": {
+      "client_auth_type": "client_secret_basic",
+      "request_type": "plain_http_request",
+      "response_type": "code",
+      "response_mode": "default",
+      "client_registration": "static_client"
+    },
+    "started": "2026-10-29T23:05:23.357967447Z",
+    "config": {
+      "alias": "openinvento",
+      "description": "openinvento OIDC login (PR for openinvento#19)",
+      "client": {
+        "client_id": "openinvento",
+        "client_secret": "(redacted test value)",
+        "redirect_uri": "https://inventory.test/api/oidc/callback/"
+      },
+      "waitTimeoutSeconds": 10
+    },
+    "description": "openinvento OIDC login (PR for openinvento#19)",
+    "alias": "openinvento",
+    "owner": {
+      "sub": "developer",
+      "iss": "https://developer.com"
+    },
+    "planId": "qWnv4RcX94Yak",
+    "status": "FINISHED",
+    "version": "5.3.4",
+    "summary": "The client must identify the invalid signature and reject the ID Token after doing ID Token validation. The client may skip this validation if the id token was received from the token endpoint as per https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation\n\nCorresponds to rp-id_token-bad-sig-rs256 test in the old test suite",
+    "publish": null,
+    "result": "PASSED"
+  },
+  "findings": []
+}

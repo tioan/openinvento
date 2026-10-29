@@ -1,0 +1,33 @@
+== build openinvento image
+== start conformance suite
+== suite images: sha256:d99fe2a5f6f6 / sha256:3dd7d2d4b71d
+== run test plans
+== variant for oidcc-client-basic-certification-test-plan: {"client_registration": "static_client", "request_type": "plain_http_request"}
+== plan oidcc-client-basic-certification-test-plan qWnv4RcX94Yak (14 modules)
+  PASSED  oidcc-client-test  (openinvento: logged in, images: 0)
+  PASSED  oidcc-client-test-invalid-iss  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-missing-sub  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-invalid-aud  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-missing-iat  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-kid-absent-single-jwks  (openinvento: logged in, images: 0)
+  PASSED  oidcc-client-test-kid-absent-multiple-jwks  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-idtoken-sig-rs256  (openinvento: logged in, images: 0)
+ SKIPPED  oidcc-client-test-idtoken-sig-none  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-invalid-sig-rs256  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-userinfo-invalid-sub  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-nonce-invalid  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-scope-userinfo-claims  (openinvento: logged in, images: 0)
+  PASSED  oidcc-client-test-client-secret-basic  (openinvento: logged in, images: 0)
+== exported oidcc-client-basic-certification-test-plan: HTTP 200, 666535 bytes
+== variant for oidcc-client-config-certification-test-plan: {"client_auth_type": "client_secret_basic", "response_mode": "default", "client_registration": "static_client", "request_type": "plain_http_request"}
+== plan oidcc-client-config-certification-test-plan Dds4MAFRqRhUt (6 modules)
+  PASSED  oidcc-client-test-discovery-openid-config  (openinvento: discovery only, redirect to https://localhost.emobix.co.uk:8443/test/a/openinvento/authorize, images: 0)
+  FAILED  oidcc-client-test-discovery-jwks-uri-keys  (openinvento: rejected, images: 0)
+            FAILURE: oidcc-client-test-discovery-jwks-uri-keys: Illegal test state change: FINISHED -> RUNNING
+  PASSED  oidcc-client-test-discovery-issuer-mismatch  (openinvento: rejected, images: 0)
+ SKIPPED  oidcc-client-test-idtoken-sig-none  (openinvento: rejected, images: 0)
+  PASSED  oidcc-client-test-signing-key-rotation-just-before-signing  (openinvento: logged in, images: 0)
+  PASSED  oidcc-client-test-signing-key-rotation  (openinvento: logged in, then logged in, images: 0)
+== exported oidcc-client-config-certification-test-plan: HTTP 200, 284023 bytes
+== DONE status=0
+exit 0

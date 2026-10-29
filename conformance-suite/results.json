@@ -1,0 +1,182 @@
+[
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "logged in",
+    "images": 0,
+    "test_id": "PYHUhWmoIHGmUKy"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-invalid-iss",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "SBaTBA4HDVRnNXG"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-missing-sub",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "IogncCjqlnHNm8w"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-invalid-aud",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "CATVpTzT6jUdCLj"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-missing-iat",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "fcppCe1OTdWPgsa"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-kid-absent-single-jwks",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "logged in",
+    "images": 0,
+    "test_id": "TMslDL01BqcGilI"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-kid-absent-multiple-jwks",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "p1iD24rbvAta64l"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-idtoken-sig-rs256",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "logged in",
+    "images": 0,
+    "test_id": "5UBNTpb9t2czWpr"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-idtoken-sig-none",
+    "status": "FINISHED",
+    "result": "SKIPPED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "vdygpb2MZmv2WDQ"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-invalid-sig-rs256",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "Qea6MjpQTk6zaZM"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-userinfo-invalid-sub",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "cVvjdpOuN2Hjurn"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-nonce-invalid",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "BNziVnYJmXwV59q"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-scope-userinfo-claims",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "logged in",
+    "images": 0,
+    "test_id": "utnlYMcC2nMUwIR"
+  },
+  {
+    "plan": "oidcc-client-basic-certification-test-plan",
+    "module": "oidcc-client-test-client-secret-basic",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "logged in",
+    "images": 0,
+    "test_id": "fZwJwBV3mUOTYfg"
+  },
+  {
+    "plan": "oidcc-client-config-certification-test-plan",
+    "module": "oidcc-client-test-discovery-openid-config",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "discovery only, redirect to https://localhost.emobix.co.uk:8443/test/a/openinvento/authorize",
+    "images": 0,
+    "test_id": "2xF8xoDqrQO8MHL"
+  },
+  {
+    "plan": "oidcc-client-config-certification-test-plan",
+    "module": "oidcc-client-test-discovery-jwks-uri-keys",
+    "status": "FINISHED",
+    "result": "FAILED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "R5xto1e6N4mpCYl"
+  },
+  {
+    "plan": "oidcc-client-config-certification-test-plan",
+    "module": "oidcc-client-test-discovery-issuer-mismatch",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "SmIAa7ImR5u6CLr"
+  },
+  {
+    "plan": "oidcc-client-config-certification-test-plan",
+    "module": "oidcc-client-test-idtoken-sig-none",
+    "status": "FINISHED",
+    "result": "SKIPPED",
+    "app": "rejected",
+    "images": 0,
+    "test_id": "rG6dmoAfVnW5lJP"
+  },
+  {
+    "plan": "oidcc-client-config-certification-test-plan",
+    "module": "oidcc-client-test-signing-key-rotation-just-before-signing",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "logged in",
+    "images": 0,
+    "test_id": "t9Ds0LwkJrRTBMV"
+  },
+  {
+    "plan": "oidcc-client-config-certification-test-plan",
+    "module": "oidcc-client-test-signing-key-rotation",
+    "status": "FINISHED",
+    "result": "PASSED",
+    "app": "logged in, then logged in",
+    "images": 0,
+    "test_id": "fN8ppow2kCGKC1w"
+  }
+]

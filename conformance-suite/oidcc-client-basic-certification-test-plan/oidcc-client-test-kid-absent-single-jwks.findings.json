@@ -1,0 +1,38 @@
+{
+  "info": {
+    "_id": "TMslDL01BqcGilI",
+    "testId": "TMslDL01BqcGilI",
+    "testName": "oidcc-client-test-kid-absent-single-jwks",
+    "variant": {
+      "client_auth_type": "client_secret_basic",
+      "request_type": "plain_http_request",
+      "response_type": "code",
+      "response_mode": "default",
+      "client_registration": "static_client"
+    },
+    "started": "2026-10-29T23:04:08.033366805Z",
+    "config": {
+      "alias": "openinvento",
+      "description": "openinvento OIDC login (PR for openinvento#19)",
+      "client": {
+        "client_id": "openinvento",
+        "client_secret": "(redacted test value)",
+        "redirect_uri": "https://inventory.test/api/oidc/callback/"
+      },
+      "waitTimeoutSeconds": 10
+    },
+    "description": "openinvento OIDC login (PR for openinvento#19)",
+    "alias": "openinvento",
+    "owner": {
+      "sub": "developer",
+      "iss": "https://developer.com"
+    },
+    "planId": "qWnv4RcX94Yak",
+    "status": "FINISHED",
+    "version": "5.3.4",
+    "summary": "Use the single matching key out of the Issuer's published set to verify the ID Tokens signature and accept the ID Token after doing ID Token validation. Corresponds to rp-id_token-kid-absent-single-jwks test in the old test suite",
+    "publish": null,
+    "result": "PASSED"
+  },
+  "findings": []
+}

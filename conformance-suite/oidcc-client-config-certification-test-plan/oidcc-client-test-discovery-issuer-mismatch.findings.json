@@ -1,0 +1,38 @@
+{
+  "info": {
+    "_id": "SmIAa7ImR5u6CLr",
+    "testId": "SmIAa7ImR5u6CLr",
+    "testName": "oidcc-client-test-discovery-issuer-mismatch",
+    "variant": {
+      "client_auth_type": "client_secret_basic",
+      "request_type": "plain_http_request",
+      "response_type": "code",
+      "response_mode": "default",
+      "client_registration": "static_client"
+    },
+    "started": "2026-10-29T23:07:20.852039342Z",
+    "config": {
+      "alias": "openinvento",
+      "description": "openinvento OIDC login (PR for openinvento#19)",
+      "client": {
+        "client_id": "openinvento",
+        "client_secret": "(redacted test value)",
+        "redirect_uri": "https://inventory.test/api/oidc/callback/"
+      },
+      "waitTimeoutSeconds": 10
+    },
+    "description": "openinvento OIDC login (PR for openinvento#19)",
+    "alias": "openinvento",
+    "owner": {
+      "sub": "developer",
+      "iss": "https://developer.com"
+    },
+    "planId": "Dds4MAFRqRhUt",
+    "status": "FINISHED",
+    "version": "5.3.4",
+    "summary": "The client is expected to retrieve OpenID Provider Configuration Information from the .well-known/openid-configuration endpoint and detect that the issuer in the provider configuration does not match the one returned by WebFinger.Corresponds to rp-discovery-issuer-not-matching-config test in the old test suite.",
+    "publish": null,
+    "result": "PASSED"
+  },
+  "findings": []
+}

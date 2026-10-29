@@ -1,0 +1,27 @@
+[
+  {
+    "check": "request failed",
+    "ok": true,
+    "detail": "POST https://dex.test/dex/auth/local/login?back=&state=snp7okpzoqlxtodoxe4ela2d6 -> net::ERR_NETWORK_CHANGED"
+  },
+  {
+    "check": "known provider page",
+    "ok": false,
+    "detail": "chrome-error://chromewebdata/"
+  },
+  {
+    "check": "first login",
+    "ok": true,
+    "detail": "user=alice name=alice email=alice@example.test"
+  },
+  {
+    "check": "no local password",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "check": "second login reuses account",
+    "ok": true,
+    "detail": "alice"
+  }
+]

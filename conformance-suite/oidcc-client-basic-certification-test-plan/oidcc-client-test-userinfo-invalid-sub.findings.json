@@ -1,0 +1,38 @@
+{
+  "info": {
+    "_id": "cVvjdpOuN2Hjurn",
+    "testId": "cVvjdpOuN2Hjurn",
+    "testName": "oidcc-client-test-userinfo-invalid-sub",
+    "variant": {
+      "client_auth_type": "client_secret_basic",
+      "request_type": "plain_http_request",
+      "response_type": "code",
+      "response_mode": "default",
+      "client_registration": "static_client"
+    },
+    "started": "2026-10-29T23:05:45.439858043Z",
+    "config": {
+      "alias": "openinvento",
+      "description": "openinvento OIDC login (PR for openinvento#19)",
+      "client": {
+        "client_id": "openinvento",
+        "client_secret": "(redacted test value)",
+        "redirect_uri": "https://inventory.test/api/oidc/callback/"
+      },
+      "waitTimeoutSeconds": 10
+    },
+    "description": "openinvento OIDC login (PR for openinvento#19)",
+    "alias": "openinvento",
+    "owner": {
+      "sub": "developer",
+      "iss": "https://developer.com"
+    },
+    "planId": "qWnv4RcX94Yak",
+    "status": "FINISHED",
+    "version": "5.3.4",
+    "summary": "The client is expected to make a userinfo request  and verify the 'sub' value of the UserInfo Response by comparing it with the ID Token's 'sub' value. The client must identify the invalid 'sub' value and reject the UserInfo Response. Corresponds to rp-userinfo-bad-sub-claim test in the old suite.",
+    "publish": null,
+    "result": "PASSED"
+  },
+  "findings": []
+}
