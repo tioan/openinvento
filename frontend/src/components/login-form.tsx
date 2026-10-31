@@ -16,8 +16,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "cn"
 import { useTranslation } from "react-i18next"
 
-import { getOIDCConfig, login, startOIDCLogin, type OIDCConfig } from "@/utils/api/auth"
-import { getInstanceSettings } from "@/utils/api/settings"
+import { getLoginConfig, login, startOIDCLogin, type LoginConfig } from "@/utils/api/auth"
 import { getAuthErrorMessage } from "@/utils/api/auth-errors"
 
 export function LoginForm({
@@ -37,31 +36,20 @@ export function LoginForm({
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [allowEmailLogin, setAllowEmailLogin] = useState(false)
-  const [allowSignup, setAllowSignup] = useState(false)
-  const [oidcConfig, setOidcConfig] = useState<OIDCConfig | null>(null)
+  const [loginConfig, setLoginConfig] = useState<LoginConfig | null>(null)
   const [redirecting, setRedirecting] = useState(false)
 
   useEffect(() => {
-    getOIDCConfig()
+    getLoginConfig()
       .then((config) => {
-        setOidcConfig(config)
-        if (config.enabled && config.auto_redirect && !ssoFailed && !forceLocalLogin && !loggedOut) {
+        setLoginConfig(config)
+        if (config.oidc.enabled && config.oidc.auto_redirect && !ssoFailed && !forceLocalLogin && !loggedOut) {
           setRedirecting(true)
           startOIDCLogin()
         }
       })
       .catch(() => undefined)
   }, [ssoFailed, forceLocalLogin, loggedOut])
-
-  useEffect(() => {
-    getInstanceSettings()
-      .then((settings) => {
-        setAllowEmailLogin(settings.allow_email_login)
-        setAllowSignup(settings.allow_signup)
-      })
-      .catch(() => undefined)
-  }, [])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -78,10 +66,13 @@ export function LoginForm({
     }
   }
 
+  const oidcConfig = loginConfig?.oidc
   const ssoEnabled = Boolean(oidcConfig?.enabled)
+  const allowEmailLogin = Boolean(loginConfig?.allow_email_login)
+  const allowSignup = Boolean(loginConfig?.allow_signup)
   // Without single sign-on the password form is the only way in, e.g. for break-glass accounts.
   const showPasswordForm =
-    !oidcConfig || !oidcConfig.enabled || oidcConfig.local_login_enabled || forceLocalLogin
+    !loginConfig || !ssoEnabled || loginConfig.local_login_enabled || forceLocalLogin
   const ssoButtonLabel = oidcConfig?.button_label
     ? t("auth.sso.buttonWithProvider", { provider: oidcConfig.button_label })
     : t("auth.sso.button")

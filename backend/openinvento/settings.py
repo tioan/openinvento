@@ -183,6 +183,9 @@ ALLOWED_HOSTS = [_host_from_url(host) for host in allowed_hosts_env]
 
 APP_URLS = [url for url in (_normalize_app_url(item) for item in APP_URLS) if url]
 APP_URL = _normalize_app_url(APP_URL) if APP_URL else ""
+# With only APP_URLS set, the first entry is the canonical origin (e.g. for the OIDC redirect URI).
+if not APP_URL and APP_URLS:
+    APP_URL = APP_URLS[0]
 for url in ([APP_URL] if APP_URL else []) + APP_URLS:
     host = _host_from_url(url)
     if host and host not in ALLOWED_HOSTS:
@@ -236,6 +239,13 @@ OIDC_TIMEOUT = int(os.getenv("OIDC_TIMEOUT", "10"))
 # Plain http for the issuer and endpoints is refused except on loopback; this allows it (tests only).
 OIDC_ALLOW_INSECURE_HTTP = _env_flag("OIDC_ALLOW_INSECURE_HTTP", False)
 OIDC_TOKEN_USE_BASIC_AUTH = _env_flag("OIDC_TOKEN_USE_BASIC_AUTH", False)  # client_secret_basic instead of _post
+# Full redirect URI registered at the provider; defaults to APP_URL + /api/oidc/callback/.
+OIDC_REDIRECT_URI = os.getenv("OIDC_REDIRECT_URI", "").strip()
+# CA certificate file (PEM) or directory for a provider with a private or self-signed certificate.
+OIDC_CA_BUNDLE = os.getenv("OIDC_CA_BUNDLE", "").strip()
+# Turns off certificate checks for provider requests. Anyone on the network path can then read
+# the client secret and log in as any user; prefer OIDC_CA_BUNDLE.
+OIDC_SKIP_SSL_VERIFICATION = _env_flag("OIDC_SKIP_SSL_VERIFICATION", False)
 OIDC_USE_PKCE = True
 
 if OIDC_ENABLED and not (OIDC_ISSUER and OIDC_RP_CLIENT_ID):

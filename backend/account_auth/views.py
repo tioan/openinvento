@@ -90,17 +90,25 @@ class LoginView(APIView):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class OIDCConfigView(APIView):
-    """Public login page settings for single sign-on."""
+class LoginConfigView(APIView):
+    """Public settings for the login and signup pages.
+
+    Kept apart from the instance settings, which need a login: only the fields listed here are
+    public, so a field added to the instance settings later never becomes public by accident.
+    """
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
         enabled = oidc_enabled()
         return Response({
-            'enabled': enabled,
-            'button_label': settings.OIDC_BUTTON_LABEL,
-            'auto_redirect': enabled and settings.OIDC_AUTO_REDIRECT,
+            'oidc': {
+                'enabled': enabled,
+                'button_label': settings.OIDC_BUTTON_LABEL,
+                'auto_redirect': enabled and settings.OIDC_AUTO_REDIRECT,
+            },
             'local_login_enabled': not settings.DISABLE_LOCAL_LOGIN,
+            'allow_email_login': InstanceSettings.get_solo().allow_email_login,
+            'allow_signup': settings.ENABLE_SIGNUP and not settings.DISABLE_LOCAL_LOGIN,
         })
 
 

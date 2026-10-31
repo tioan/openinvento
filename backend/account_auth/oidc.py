@@ -4,12 +4,14 @@ The library is extended with:
 - provider discovery (OpenID Connect Discovery 1.0) unless endpoints are set explicitly,
 - issuer, audience and azp checks of the ID token (OpenID Connect Core 1.0, section 3.1.3.7),
 - user lookup by issuer + subject instead of the email address,
-- a redirect URI built from APP_URL, so it stays correct behind a TLS-terminating proxy,
+- a redirect URI built from OIDC_REDIRECT_URI or APP_URL, so it stays correct behind a TLS-terminating proxy,
+- a custom CA bundle for providers with a private certificate,
 - the hardening listed in the requirement catalog of the pull request: token_type, iss
   response parameter (RFC 9207), state expiry, signing algorithm allow-list, clock skew.
 """
 
 import logging
+import os
 import re
 import time
 from urllib.parse import quote_plus, urljoin, urlsplit
@@ -44,10 +46,10 @@ DISCOVERY_CACHE_SECONDS = 60 * 60
 CLOCK_SKEW_SECONDS = 60
 # Pending logins (state, nonce, PKCE verifier) expire, which keeps the window for a stolen code short.
 STATE_MAX_AGE_SECONDS = 10 * 60
+# Only asymmetric algorithms: with HS256/384/512 the client secret is the signing key (OpenID Connect
+# Core 1.0, section 10.1), so anyone who reads it from the configuration could issue ID tokens for any
+# user. Every OpenID provider must support RS256 (section 15.1).
 ASYMMETRIC_SIGN_ALGOS = {"RS256", "RS384", "RS512", "ES256", "ES384", "ES512"}
-# HMAC-signed ID tokens use the client secret as key (OpenID Connect Core 1.0, section 10.1).
-HMAC_SIGN_ALGOS = {"HS256", "HS384", "HS512"}
-HMAC_MIN_SECRET_LENGTH = 32
 LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
 # Key type (and EC curve) each supported algorithm needs (RFC 7518, sections 3.1 and 6).
 KEY_TYPE_FOR_ALGO = {
@@ -75,15 +77,32 @@ class OIDCConfigurationError(ValueError):
 
 
 def sign_algo_supported():
-    algo = settings.OIDC_RP_SIGN_ALGO
-    if algo in ASYMMETRIC_SIGN_ALGOS:
-        return True
-    return algo in HMAC_SIGN_ALGOS and len(settings.OIDC_RP_CLIENT_SECRET) >= HMAC_MIN_SECRET_LENGTH
+    return settings.OIDC_RP_SIGN_ALGO in ASYMMETRIC_SIGN_ALGOS
+
+
+def tls_settings_problem():
+    """Return why the TLS settings for provider requests are unusable, or None."""
+    if settings.OIDC_SKIP_SSL_VERIFICATION and settings.OIDC_CA_BUNDLE:
+        return "OIDC_SKIP_SSL_VERIFICATION and OIDC_CA_BUNDLE are both set; use only one."
+    if settings.OIDC_CA_BUNDLE and not os.path.exists(settings.OIDC_CA_BUNDLE):
+        return f"OIDC_CA_BUNDLE {settings.OIDC_CA_BUNDLE!r} does not exist."
+    return None
+
+
+def tls_verify():
+    """The verify argument for requests: a CA bundle, the default trust store, or no check at all."""
+    if settings.OIDC_SKIP_SSL_VERIFICATION:
+        return False
+    return settings.OIDC_CA_BUNDLE or True
 
 
 def oidc_enabled():
     return bool(
-        settings.OIDC_ENABLED and settings.OIDC_ISSUER and settings.OIDC_RP_CLIENT_ID and sign_algo_supported()
+        settings.OIDC_ENABLED
+        and settings.OIDC_ISSUER
+        and settings.OIDC_RP_CLIENT_ID
+        and sign_algo_supported()
+        and tls_settings_problem() is None
     )
 
 
@@ -112,6 +131,8 @@ def changes_break_glass_username(old_username, new_username):
 
 
 def get_callback_url(request):
+    if settings.OIDC_REDIRECT_URI:
+        return settings.OIDC_REDIRECT_URI
     path = reverse("oidc_authentication_callback")
     if settings.APP_URL:
         return settings.APP_URL + path
@@ -141,7 +162,7 @@ def provider_get(url, name, **kwargs):
 
     response = requests.get(
         url,
-        verify=getattr(settings, "OIDC_VERIFY_SSL", True),
+        verify=tls_verify(),
         timeout=settings.OIDC_TIMEOUT,
         proxies=getattr(settings, "OIDC_PROXY", None),
         hooks={"response": check_redirect_target},
@@ -231,7 +252,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
             self.OIDC_OP_TOKEN_ENDPOINT,
             data=payload,
             auth=auth,
-            verify=self.get_settings("OIDC_VERIFY_SSL", True),
+            verify=tls_verify(),
             timeout=self.get_settings("OIDC_TIMEOUT", None),
             proxies=self.get_settings("OIDC_PROXY", None),
             # A 307/308 would resend the code, the PKCE verifier and the client secret, possibly over http.
@@ -284,7 +305,11 @@ class OIDCBackend(OIDCAuthenticationBackend):
             "OIDC_OP_USER_ENDPOINT",
             headers={"Authorization": f"Bearer {access_token}"},
         )
-        if response.headers.get("content-type", "").lower().startswith("application/jwt"):
+        # OpenID Connect Core 1.0, section 5.3.2: the response is either JSON or a JWT.
+        content_type = response.headers.get("content-type", "").split(";")[0].strip().lower()
+        if content_type not in ("application/json", "application/jwt"):
+            raise SuspiciousOperation(f"UserInfo response has unexpected content type {content_type!r}.")
+        if content_type == "application/jwt":
             userinfo = self.verify_token(response.text)
             # OpenID Connect Core 1.0, section 5.3.2: a signed response must contain iss and aud.
             audiences = userinfo.get("aud")

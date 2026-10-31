@@ -20,7 +20,7 @@ from rest_framework.test import APIClient
 
 from inventory.models import Inventory
 
-from .models import CustomUser, OIDCIdentity
+from .models import CustomUser, InstanceSettings, OIDCIdentity
 from .oidc import OIDCConfigurationError, provider_get
 
 ISSUER = 'https://idp.example.test'
@@ -43,6 +43,9 @@ OIDC_SETTINGS = {
 	'OIDC_LINK_EXISTING_BY_EMAIL': False,
 	'DISABLE_LOCAL_LOGIN': False,
 	'LOCAL_LOGIN_USERS': [],
+	'OIDC_REDIRECT_URI': '',
+	'OIDC_CA_BUNDLE': '',
+	'OIDC_SKIP_SSL_VERIFICATION': False,
 }
 
 
@@ -84,7 +87,9 @@ class FakeProvider:
 		self.id_token_signing = {'key': self.private_key, 'algorithm': 'RS256', 'headers': {'kid': 'test-key'}}
 		self.userinfo = {}
 		self.userinfo_jwt = None
+		self.userinfo_content_type = 'application/json'
 		self.userinfo_requests = 0
+		self.get_kwargs = []
 		self.metadata_extra = {}
 		# Requested URL -> URL the provider redirects it to.
 		self.redirects = {}
@@ -123,6 +128,7 @@ class FakeProvider:
 		return jwt.encode(claims, **self.id_token_signing)
 
 	def get(self, url, hooks=None, **kwargs):
+		self.get_kwargs.append(kwargs)
 		# Like requests: run the response hook on each redirect before following it.
 		hook = (hooks or {}).get('response')
 		history = []
@@ -152,7 +158,7 @@ class FakeProvider:
 			self.userinfo_requests += 1
 			if self.userinfo_jwt is not None:
 				return FakeResponse(url=url, content_type='application/jwt', text=self.userinfo_jwt)
-			return FakeResponse(self.userinfo, url=url)
+			return FakeResponse(self.userinfo, url=url, content_type=self.userinfo_content_type)
 		return FakeResponse({}, status_code=404, url=url)
 
 	def post(self, url, data=None, **kwargs):
@@ -202,26 +208,39 @@ class OIDCTestCase(TestCase):
 		self.assertFalse(self.client.get('/api/me/').data['authenticated'])
 
 
-class OIDCConfigTests(OIDCTestCase):
+class LoginConfigTests(OIDCTestCase):
 	@override_settings(OIDC_ENABLED=False)
 	def test_config_reports_disabled_oidc(self):
-		response = APIClient().get('/api/oidc/config/')
+		response = APIClient().get('/api/login-config/')
 
 		self.assertEqual(response.status_code, 200)
-		self.assertFalse(response.data['enabled'])
+		self.assertFalse(response.data['oidc']['enabled'])
 		self.assertTrue(response.data['local_login_enabled'])
 
-	@override_settings(OIDC_BUTTON_LABEL='Pocket ID', OIDC_AUTO_REDIRECT=True, DISABLE_LOCAL_LOGIN=True)
+	@override_settings(OIDC_BUTTON_LABEL='Pocket ID', OIDC_AUTO_REDIRECT=True, DISABLE_LOCAL_LOGIN=True, ENABLE_SIGNUP=True)
 	def test_config_is_public_and_exposes_only_login_page_settings(self):
-		response = APIClient().get('/api/oidc/config/')
+		response = APIClient().get('/api/login-config/')
 
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.data, {
-			'enabled': True,
-			'button_label': 'Pocket ID',
-			'auto_redirect': True,
+			'oidc': {'enabled': True, 'button_label': 'Pocket ID', 'auto_redirect': True},
 			'local_login_enabled': False,
+			'allow_email_login': False,
+			# Signup is a local login, so DISABLE_LOCAL_LOGIN turns it off as well.
+			'allow_signup': False,
 		})
+
+	@override_settings(ENABLE_SIGNUP=True)
+	def test_config_reports_signup_and_email_login_to_logged_out_visitors(self):
+		InstanceSettings.objects.update_or_create(pk=1, defaults={'allow_email_login': True})
+
+		response = APIClient().get('/api/login-config/')
+
+		self.assertTrue(response.data['allow_email_login'])
+		self.assertTrue(response.data['allow_signup'])
+
+	def test_instance_settings_still_need_a_login(self):
+		self.assertIn(APIClient().get('/api/instance-settings/').status_code, (401, 403))
 
 	@override_settings(OIDC_ENABLED=False)
 	def test_login_endpoints_return_404_when_disabled(self):
@@ -828,7 +847,7 @@ class OIDCHardeningTests(OIDCTestCase):
 
 	@override_settings(OIDC_RP_SIGN_ALGO='none')
 	def test_unsupported_sign_algo_disables_oidc(self):
-		self.assertFalse(APIClient().get('/api/oidc/config/').data['enabled'])
+		self.assertFalse(APIClient().get('/api/login-config/').data['oidc']['enabled'])
 		self.assertEqual(self.client.get('/api/oidc/authenticate/').status_code, 404)
 
 	@override_settings(OIDC_RP_SIGN_ALGO='PS256')
@@ -840,9 +859,11 @@ class OIDCHardeningTests(OIDCTestCase):
 
 		self.assertIn('OIDC_SIGN_ALGO', logs.output[0])
 
-	@override_settings(OIDC_RP_SIGN_ALGO='HS256', OIDC_RP_CLIENT_SECRET='short')
-	def test_hmac_algo_needs_a_long_client_secret(self):
-		self.assertFalse(APIClient().get('/api/oidc/config/').data['enabled'])
+	@override_settings(OIDC_RP_SIGN_ALGO='HS256', OIDC_RP_CLIENT_SECRET='a-client-secret-that-is-long-enough-for-hmac')
+	def test_hmac_algorithms_are_not_supported(self):
+		# The client secret would be the signing key, so anyone who knows it could issue ID tokens.
+		self.assertFalse(APIClient().get('/api/login-config/').data['oidc']['enabled'])
+		self.assertEqual(self.client.get('/api/oidc/authenticate/').status_code, 404)
 
 	# ID token claims (OIDC Core 3.1.3.7)
 
@@ -930,6 +951,17 @@ class OIDCHardeningTests(OIDCTestCase):
 
 		self.assert_login_failed(self.login())
 
+	def test_userinfo_json_with_charset_is_accepted(self):
+		self.provider.userinfo_content_type = 'application/json; charset=utf-8'
+
+		self.assertEqual(self.login()['Location'], '/app')
+
+	def test_userinfo_with_other_content_type_is_rejected(self):
+		# OIDC Core 1.0, section 5.3.2: UserInfo is JSON or a JWT; an HTML error page is neither.
+		self.provider.userinfo_content_type = 'text/html'
+
+		self.assert_login_failed(self.login())
+
 	# Authorization request and response (OIDC Core 3.1.2, RFC 9207, RFC 9700)
 
 	@override_settings(OIDC_RP_SCOPES='profile email')
@@ -1003,6 +1035,19 @@ class OIDCHardeningTests(OIDCTestCase):
 		_, params = self.start_login()
 
 		self.assertEqual(params['redirect_uri'], 'http://testserver/api/oidc/callback/')
+
+	@override_settings(OIDC_REDIRECT_URI='https://other.example.test/api/oidc/callback/')
+	def test_redirect_uri_can_be_set_explicitly(self):
+		response = self.login()
+
+		self.assertEqual(response['Location'], '/app')
+		self.assertEqual(self.provider.token_requests[0]['redirect_uri'], 'https://other.example.test/api/oidc/callback/')
+
+	@override_settings(OIDC_REDIRECT_URI='https://other.example.test/api/oidc/callback/')
+	def test_authorization_request_uses_explicit_redirect_uri(self):
+		_, params = self.start_login()
+
+		self.assertEqual(params['redirect_uri'], 'https://other.example.test/api/oidc/callback/')
 
 	def test_discovery_without_required_endpoint_fails(self):
 		self.provider.metadata_extra = {'jwks_uri': None}
@@ -1160,3 +1205,51 @@ class ProviderGetTransportTests(SimpleTestCase):
 		provider_get(f'{ISSUER}/jwks', 'OIDC_OP_JWKS_ENDPOINT')
 
 		self.assertEqual(sent, [f'{ISSUER}/jwks', f'{ISSUER}/realms/main/jwks'])
+
+
+class OIDCTLSSettingsTests(OIDCTestCase):
+	def test_default_trust_store_is_used(self):
+		self.assertEqual(self.login()['Location'], '/app')
+
+		self.assertTrue(all(kwargs['verify'] is True for kwargs in self.provider.get_kwargs))
+		self.assertIs(self.provider.token_request_kwargs[0]['verify'], True)
+
+	def test_custom_ca_bundle_is_used_for_every_provider_request(self):
+		with override_settings(OIDC_CA_BUNDLE=__file__):
+			self.assertEqual(self.login()['Location'], '/app')
+
+		# Discovery, JWKS and UserInfo, plus the token request.
+		self.assertEqual(len(self.provider.get_kwargs), 3)
+		self.assertTrue(all(kwargs['verify'] == __file__ for kwargs in self.provider.get_kwargs))
+		self.assertEqual(self.provider.token_request_kwargs[0]['verify'], __file__)
+
+	@override_settings(OIDC_SKIP_SSL_VERIFICATION=True)
+	def test_certificate_checks_can_be_turned_off(self):
+		self.assertEqual(self.login()['Location'], '/app')
+
+		self.assertTrue(all(kwargs['verify'] is False for kwargs in self.provider.get_kwargs))
+		self.assertIs(self.provider.token_request_kwargs[0]['verify'], False)
+
+	@override_settings(OIDC_SKIP_SSL_VERIFICATION=True)
+	def test_turned_off_certificate_checks_are_logged_at_startup(self):
+		from django.apps import apps
+
+		with self.assertLogs('account_auth.oidc', level='WARNING') as logs:
+			apps.get_app_config('account_auth').ready()
+
+		self.assertIn('OIDC_SKIP_SSL_VERIFICATION', logs.output[0])
+
+	def test_skip_and_ca_bundle_together_disable_oidc(self):
+		from django.apps import apps
+
+		with override_settings(OIDC_SKIP_SSL_VERIFICATION=True, OIDC_CA_BUNDLE=__file__):
+			self.assertFalse(APIClient().get('/api/login-config/').data['oidc']['enabled'])
+			with self.assertLogs('account_auth.oidc', level='ERROR') as logs:
+				apps.get_app_config('account_auth').ready()
+
+		self.assertIn('use only one', logs.output[0])
+
+	@override_settings(OIDC_CA_BUNDLE='/nonexistent/ca.pem')
+	def test_missing_ca_bundle_disables_oidc(self):
+		self.assertFalse(APIClient().get('/api/login-config/').data['oidc']['enabled'])
+		self.assertEqual(self.client.get('/api/oidc/authenticate/').status_code, 404)

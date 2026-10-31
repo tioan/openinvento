@@ -13,17 +13,21 @@ services:
       CREATE_INIT_ADMIN: ${CREATE_INIT_ADMIN:-true} # Set to false to disable initial administrator creation
       ENABLE_SIGNUP: ${ENABLE_SIGNUP:-false} # Set to true to enable public account signup
       SECRET_KEY: ${SECRET_KEY} # Set this to a random string for security purposes - You can generate one with `openssl rand -hex 32`
-      # Single sign-on via OpenID Connect (optional). Needs APP_URL; register ${APP_URL}/api/oidc/callback/ as redirect URI at your provider.
+      # Single sign-on via OpenID Connect (optional). Needs APP_URL (with APP_URLS only, the first entry counts); register ${APP_URL}/api/oidc/callback/ as redirect URI at your provider.
       #OIDC_ENABLED: ${OIDC_ENABLED:-false} # Set to true to show the single sign-on button on the login page
       #OIDC_ISSUER: ${OIDC_ISSUER} # Issuer URL of your provider (e.g. https://id.example.com) - endpoints are discovered from it
       #OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
       #OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET} # Leave empty for public clients (PKCE only)
       #OIDC_BUTTON_LABEL: ${OIDC_BUTTON_LABEL} # Provider name on the login button (e.g. Pocket ID)
       #OIDC_AUTO_REDIRECT: ${OIDC_AUTO_REDIRECT:-false} # Skip the login page and go straight to the provider (/auth/login?local=1 still shows it)
+      #OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI} # Full redirect URI registered at your provider, if it is not ${APP_URL}/api/oidc/callback/
+      #OIDC_CA_BUNDLE: /certs/ca.pem # CA certificate (PEM) for a provider with a private or self-signed certificate; mount it below
+      #OIDC_SKIP_SSL_VERIFICATION: ${OIDC_SKIP_SSL_VERIFICATION:-false} # Insecure: no certificate check for the provider, anyone on the network path can log in as any user; prefer OIDC_CA_BUNDLE
       #DISABLE_LOCAL_LOGIN: ${DISABLE_LOCAL_LOGIN:-false} # Disable password login and signup for everyone except LOCAL_LOGIN_USERS
       #LOCAL_LOGIN_USERS: ${LOCAL_LOGIN_USERS} # Comma-separated break-glass usernames that keep password login (default: INIT_ADMIN_USERNAME); they sign in at /auth/login?local=1
     volumes:
       - openinvento-data:/data
+      #- ./ca.pem:/certs/ca.pem:ro # CA certificate for OIDC_CA_BUNDLE
 
 volumes:
   openinvento-data:

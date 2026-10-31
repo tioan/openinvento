@@ -11,15 +11,20 @@ export type SessionUser = {
   has_password: boolean
 }
 
-export type OIDCConfig = {
-  enabled: boolean
-  button_label: string
-  auto_redirect: boolean
+// Public settings for the login and signup pages; /api/instance-settings/ needs a login.
+export type LoginConfig = {
+  oidc: {
+    enabled: boolean
+    button_label: string
+    auto_redirect: boolean
+  }
   local_login_enabled: boolean
+  allow_email_login: boolean
+  allow_signup: boolean
 }
 
-export async function getOIDCConfig() {
-  return fetchData<OIDCConfig>("/api/oidc/config/")
+export async function getLoginConfig() {
+  return fetchData<LoginConfig>("/api/login-config/")
 }
 
 // A full page navigation, since the provider redirects back to the backend callback.
