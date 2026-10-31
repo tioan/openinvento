@@ -278,6 +278,10 @@ class OIDCBackend(OIDCAuthenticationBackend):
         """Replaces the base class so the JWKS is fetched with provider_get and tokens without kid work."""
         header = jwt.get_unverified_header(token)
         algo = header.get("alg")
+        # Also checked in _verify_jws; checking it before the key lookup names the actual problem
+        # when a provider signs with another algorithm (e.g. HS256) instead of "no matching key".
+        if algo != self.OIDC_RP_SIGN_ALGO:
+            raise SuspiciousOperation(f"Token algorithm {algo!r} does not match OIDC_SIGN_ALGO.")
         jwks = provider_get(self.OIDC_OP_JWKS_ENDPOINT, "OIDC_OP_JWKS_ENDPOINT").json().get("keys", [])
         if "kid" in header:
             # Same selection as the base class: matching kid, and matching alg where the key names one.

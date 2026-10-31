@@ -845,6 +845,16 @@ class OIDCHardeningTests(OIDCTestCase):
 
 		self.assert_login_failed(self.login())
 
+	def test_hmac_signed_id_token_names_the_algorithm_mismatch(self):
+		# Authentik without a signing key: HS256 with the client secret and a kid.
+		_, params = self.start_login()
+		self.provider.token_response = {'id_token': hs256_token(self.id_token_claims(), b'client-secret')}
+
+		with self.assertLogs('account_auth.oidc', level='WARNING') as logs:
+			self.assert_login_failed(self.callback(params))
+
+		self.assertIn("Token algorithm 'HS256' does not match OIDC_SIGN_ALGO", logs.output[0])
+
 	@override_settings(OIDC_RP_SIGN_ALGO='none')
 	def test_unsupported_sign_algo_disables_oidc(self):
 		self.assertFalse(APIClient().get('/api/login-config/').data['oidc']['enabled'])
