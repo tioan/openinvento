@@ -8,6 +8,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.http import FileResponse, Http404, JsonResponse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -85,7 +86,9 @@ class InstanceBackupView(APIView):
 
         archive_file.seek(0)
         response = FileResponse(archive_file, content_type="application/zip")
-        response["Content-Disposition"] = 'attachment; filename="openinvento-instance-backup.zip"'
+        # Date and time (server time, UTC by default) keep several backups apart and sorted.
+        timestamp = timezone.localtime().strftime("%Y-%m-%d-%H%M%S")
+        response["Content-Disposition"] = f'attachment; filename="openinvento-instance-backup-{timestamp}.zip"'
         return response
 
 

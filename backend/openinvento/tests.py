@@ -1,7 +1,12 @@
+import tempfile
 from datetime import datetime, time, timedelta, timezone as datetime_timezone
+from unittest.mock import patch
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
+from rest_framework.test import APIClient
+
+from account_auth.models import CustomUser
 
 from .daily_scheduler import DailyScheduler
 
@@ -39,4 +44,26 @@ class DailySchedulerTests(SimpleTestCase):
 		self.assertEqual(
 			scheduler._seconds_until_next_job(now),
 			int(timedelta(days=1, hours=1).total_seconds()),
+		)
+
+
+class InstanceBackupFilenameTests(TestCase):
+	def test_filename_has_date_and_time(self):
+		admin = CustomUser.objects.create_superuser(username="admin", password="StrongPassword!123")
+		client = APIClient()
+		client.force_login(admin)
+		now = datetime(2026, 11, 1, 15, 30, 12, tzinfo=datetime_timezone.utc)
+
+		with (
+			tempfile.TemporaryDirectory() as data_dir,
+			override_settings(DATA_DIR=data_dir),
+			timezone.override("UTC"),
+			patch("django.utils.timezone.now", return_value=now),
+		):
+			response = client.get("/api/instance-settings/backup/")
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(
+			response["Content-Disposition"],
+			'attachment; filename="openinvento-instance-backup-2026-11-01-153012.zip"',
 		)
