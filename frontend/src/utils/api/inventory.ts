@@ -7,6 +7,7 @@ export type Inventory = {
   name: string
   identifier: string
   updated_at: string
+  oidc_managed: boolean // members come from single sign-on groups
 }
 
 export type ThirdPartyProviderType = string

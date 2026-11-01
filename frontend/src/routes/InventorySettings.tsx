@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
-import { Download, KeyRound, Plus, Trash2, TriangleAlert, UserMinus, UserPlus } from "lucide-react"
+import { Copy, Download, KeyRound, Plus, ShieldCheck, Trash2, TriangleAlert, UserMinus, UserPlus } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import BaseScreen from "@/layouts/BaseScreen"
 import { Button } from "@/components/ui/button"
@@ -24,11 +24,13 @@ import {
   type ThirdPartyProviderConfiguration,
 } from "@/utils/api/inventory"
 import { Input } from "@/components/ui/input"
+import { getCurrentSession } from "@/utils/api/auth"
 
 export default function InventorySettingsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [membership, setMembership] = useState<InventoryMembership | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [inventoryName, setInventoryName] = useState("")
   const [selectedUser, setSelectedUser] = useState("")
   const [nameChanged, setNameChanged] = useState(false)
@@ -65,6 +67,7 @@ export default function InventorySettingsPage() {
       if (!inventoryUuid) return
       const loadedMembership = await inventoryApi.getMembership(inventoryUuid)
       setProviders(await inventoryApi.listThirdPartyProviders(inventoryUuid))
+      setIsAdmin(Boolean((await getCurrentSession()).user?.is_superuser))
       setInventoryName(loadedMembership.inventory.name)
       setMembership(loadedMembership)
     } catch (reason) {
@@ -191,6 +194,14 @@ export default function InventorySettingsPage() {
               <label htmlFor="inventoryName" className="text-sm text-muted-foreground">{t("settings.inventory.name")}</label>
               <br />
               <Input value={inventoryName} onChange={(event) => { setInventoryName(event.target.value); setNameChanged(true) }} className="w-64" />
+              {isAdmin && <div className="mt-4">
+                <label htmlFor="inventoryId" className="text-sm text-muted-foreground">{t("settings.inventory.inventoryId")}</label>
+                <div className="flex max-w-md gap-2">
+                  <Input id="inventoryId" value={membership.inventory.uuid} readOnly className="font-mono text-xs" />
+                  <Button type="button" variant="outline" size="icon" aria-label={t("settings.inventory.copyInventoryId")} onClick={() => void navigator.clipboard?.writeText(membership.inventory.uuid)}><Copy /></Button>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">{t("settings.inventory.inventoryIdDescription")}</p>
+              </div>}
             </section>
 
             <section className="mb-8 flex items-center justify-between gap-4 my-8 mb-12 py-5">
@@ -256,21 +267,23 @@ export default function InventorySettingsPage() {
                 <Button onClick={() => void addMember()} disabled={saving || !selectedUser}><UserPlus /> {t("settings.inventory.addMember")}</Button>
               </div>}
             </div>
-            {!membership.can_invite && <p className="mb-4 text-sm text-muted-foreground">{t("settings.inventory.invitesDisabled")}</p>}
+            {membership.inventory.oidc_managed
+              ? <p className="mb-4 flex items-start gap-2 rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground"><ShieldCheck className="mt-0.5 size-4 shrink-0" />{t("settings.inventory.managedBySso")}</p>
+              : !membership.can_invite && <p className="mb-4 text-sm text-muted-foreground">{t("settings.inventory.invitesDisabled")}</p>}
 
             <div className="overflow-hidden rounded-xl border">
               <table className="w-full text-left text-sm">
-                <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-4 py-3 font-medium">{t("settings.admin.name")}</th><th className="hidden px-4 py-3 font-medium sm:table-cell">{t("settings.admin.username")}</th><th className="px-4 py-3 text-right font-medium">{t("settings.admin.actions")}</th></tr></thead>
+                <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-4 py-3 font-medium">{t("settings.admin.name")}</th><th className="hidden px-4 py-3 font-medium sm:table-cell">{t("settings.admin.username")}</th>{!membership.inventory.oidc_managed && <th className="px-4 py-3 text-right font-medium">{t("settings.admin.actions")}</th>}</tr></thead>
                 <tbody className="divide-y">{membership.members.length === 0 ? 
                   <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">{t("settings.inventory.noMembers")}</td>
+                    <td colSpan={membership.inventory.oidc_managed ? 2 : 3} className="px-4 py-8 text-center text-muted-foreground">{t("settings.inventory.noMembers")}</td>
                   </tr> : membership.members.map((user) => <tr key={user.uuid} className="hover:bg-muted/20">
                   <td className="px-4 py-3 font-medium">{user.name || user.username}</td>
                   <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{user.username}</td>
-                  <td className="px-4 py-3 text-right">
+                  {!membership.inventory.oidc_managed && <td className="px-4 py-3 text-right">
                     <Button type="button" variant="ghost" size="icon-sm" onClick={() => void removeMember(user.uuid, user.name || user.username)} disabled={saving} aria-label={t("settings.inventory.removeMember")}>
                     <UserMinus /></Button>
-                  </td>
+                  </td>}
                   </tr>)}
                 </tbody>
               </table>
@@ -283,9 +296,9 @@ export default function InventorySettingsPage() {
                 <h2 className="font-semibold text-destructive">{t("settings.inventory.dangerZone")}</h2>
                 <p className="text-sm text-muted-foreground">{t("settings.inventory.deleteConfirm", { name: membership.inventory.name })}</p>
               </div>
-              <Button variant="destructive" className="px-10" onClick={() => void deleteInventory()} disabled={saving}>{t("settings.inventory.deleteInventory")}</Button>
+              {(!membership.inventory.oidc_managed || isAdmin) && <Button variant="destructive" className="px-10" onClick={() => void deleteInventory()} disabled={saving}>{t("settings.inventory.deleteInventory")}</Button>}
             </div>
-            
+            {membership.inventory.oidc_managed && <p className="mt-3 text-sm text-muted-foreground">{t(isAdmin ? "settings.inventory.deleteManagedAdminWarning" : "settings.inventory.deleteManagedHint")}</p>}
           </section>
         </div>
       )}
