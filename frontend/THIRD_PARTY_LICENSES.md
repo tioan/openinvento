@@ -10185,7 +10185,7 @@ SOFTWARE.
 ## scheduler
 - **License:** MIT
 - **Author/Publisher:** true
-- **Repository:** https://github.com/facebook/react
+- **Repository:** https://github.com/react/react
 
 ### License Text
 ```text
