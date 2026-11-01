@@ -15,8 +15,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { cn } from "cn"
 import { useTranslation } from "react-i18next"
-import { signup } from "@/utils/api/auth"
-import { getInstanceSettings } from "@/utils/api/settings"
+import { getLoginConfig, signup } from "@/utils/api/auth"
 import { getAuthErrorMessage } from "@/utils/api/auth-errors"
 
 export function SignupForm({
@@ -36,10 +35,10 @@ export function SignupForm({
   const [allowSignup, setAllowSignup] = useState(false)
 
   useEffect(() => {
-    getInstanceSettings()
-      .then((settings) => {
-        setAllowEmailLogin(settings.allow_email_login)
-        setAllowSignup(settings.allow_signup)
+    getLoginConfig()
+      .then((config) => {
+        setAllowEmailLogin(config.allow_email_login)
+        setAllowSignup(config.allow_signup)
       })
       .catch(() => undefined)
   }, [])

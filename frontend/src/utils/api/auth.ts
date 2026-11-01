@@ -1,4 +1,4 @@
-import { fetchData, postData } from "./base"
+import { fetchData, getApiUrl, postData } from "./base"
 import { resetNotificationsCache } from "./notifications"
 
 export type SessionUser = {
@@ -8,6 +8,29 @@ export type SessionUser = {
   uuid: string
   is_superuser: boolean
   require_reset: boolean
+  has_password: boolean
+}
+
+// Public settings for the login and signup pages; /api/instance-settings/ needs a login.
+export type LoginConfig = {
+  oidc: {
+    enabled: boolean
+    button_label: string
+    auto_redirect: boolean
+  }
+  local_login_enabled: boolean
+  allow_email_login: boolean
+  allow_signup: boolean
+}
+
+export async function getLoginConfig() {
+  return fetchData<LoginConfig>("/api/login-config/")
+}
+
+// A full page navigation, since the provider redirects back to the backend callback.
+export function startOIDCLogin() {
+  resetNotificationsCache()
+  window.location.assign(getApiUrl("/api/oidc/authenticate/"))
 }
 
 export async function login(identifier: string, password: string) {

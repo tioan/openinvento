@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import CustomUser, InstanceSettings, Notification, UserAPIKey
+from .oidc import local_login_allowed, oidc_enabled
 from .serializers import (
     AdminUserSerializer,
     CredentialResetSerializer,
@@ -27,7 +28,7 @@ class SignupView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        if not settings.ENABLE_SIGNUP:
+        if not settings.ENABLE_SIGNUP or settings.DISABLE_LOCAL_LOGIN:
             # When public signup is disabled, return a 403 Forbidden response with an appropriate error message.
             return Response(
                 {'error': 'Public signup is disabled for this instance'},
@@ -37,7 +38,8 @@ class SignupView(APIView):
         if serializer.is_valid():
             # The serializer will create the user and assign an inventory - When a user is invited to an existing inventory, the inventory can be deleted later when the user accepts the invitation
             user = serializer.save()
-            login(request, user)
+            # Required since the OIDC backend is installed next to the model backend.
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return Response(
                 {
                     'detail': 'Account created successfully',
@@ -70,6 +72,13 @@ class LoginView(APIView):
             if user_obj:
                 username = user_obj.username
 
+        # Checked before the password, so the response does not reveal whether it was correct.
+        if not local_login_allowed(username):
+            return Response(
+                {'error': 'Local login is disabled for this instance'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
@@ -79,6 +88,28 @@ class LoginView(APIView):
             })
         
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class LoginConfigView(APIView):
+    """Public settings for the login and signup pages.
+
+    Kept apart from the instance settings, which need a login: only the fields listed here are
+    public, so a field added to the instance settings later never becomes public by accident.
+    """
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        enabled = oidc_enabled()
+        return Response({
+            'oidc': {
+                'enabled': enabled,
+                'button_label': settings.OIDC_BUTTON_LABEL,
+                'auto_redirect': enabled and settings.OIDC_AUTO_REDIRECT,
+            },
+            'local_login_enabled': not settings.DISABLE_LOCAL_LOGIN,
+            'allow_email_login': InstanceSettings.get_solo().allow_email_login,
+            'allow_signup': settings.ENABLE_SIGNUP and not settings.DISABLE_LOCAL_LOGIN,
+        })
 
 
 class CredentialResetView(APIView):

@@ -1,10 +1,12 @@
 from django.urls import path
 
+from .oidc import OIDCCallbackView, OIDCLoginView
 from .views import (
     CredentialResetView,
     APIKeyDetailView,
     APIKeyListView,
     GetCSRFTokenView,
+    LoginConfigView,
     LoginView,
     LogoutView,
     MeView,
@@ -22,6 +24,9 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('csrf/', GetCSRFTokenView.as_view(), name='csrf-token'),
     path('me/', MeView.as_view(), name='me'),
+    path('login-config/', LoginConfigView.as_view(), name='login-config'),
+    path('oidc/authenticate/', OIDCLoginView.as_view(), name='oidc_authentication_init'),
+    path('oidc/callback/', OIDCCallbackView.as_view(), name='oidc_authentication_callback'),
     path('sidebar/', SidebarView.as_view(), name='sidebar'),
     path('notifications/', NotificationListView.as_view(), name='notifications'),
     path('notifications/<uuid:notification_uuid>/', NotificationDetailView.as_view(), name='notification-detail'),
