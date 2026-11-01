@@ -31,6 +31,7 @@ FAILURE_URL = '/auth/login?error=sso'
 
 OIDC_SETTINGS = {
 	'APP_URL': APP_URL,
+	'APP_URLS': [],
 	'OIDC_ENABLED': True,
 	'OIDC_ISSUER': ISSUER,
 	'OIDC_RP_CLIENT_ID': CLIENT_ID,
@@ -303,6 +304,50 @@ class OIDCAuthenticationRequestTests(OIDCTestCase):
 		self.provider.answer_get = lambda url: FakeResponse([], url=url) if 'well-known' in url else answer_get(url)
 
 		self.assertEqual(self.client.get('/api/oidc/authenticate/')['Location'], FAILURE_URL)
+
+	# Several APP_URLS: the state cookie must be set on the host the callback goes to.
+
+	def start_on_host(self, host, path='/api/oidc/authenticate/'):
+		return self.client.get(path, HTTP_HOST=host)
+
+	@override_settings(APP_URLS=[APP_URL, 'https://alt.example.test'], ALLOWED_HOSTS=['inventory.example.test', 'alt.example.test'])
+	def test_login_on_other_app_host_moves_to_callback_host_first(self):
+		response = self.start_on_host('alt.example.test', '/api/oidc/authenticate/?next=/app')
+
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(response['Location'], f'{APP_URL}/api/oidc/authenticate/?next=/app')
+		self.assertNotIn('oidc_states', self.client.session)
+		self.assertEqual(self.provider.discovery_requests, 0)
+
+	@override_settings(APP_URLS=[APP_URL, 'https://alt.example.test'], ALLOWED_HOSTS=['inventory.example.test', 'alt.example.test'])
+	def test_login_on_callback_host_goes_to_provider(self):
+		response = self.start_on_host('inventory.example.test')
+
+		self.assertTrue(response['Location'].startswith(f'{ISSUER}/authorize?'))
+
+	@override_settings(APP_URLS=['http://inventory.example.test:8080'], ALLOWED_HOSTS=['inventory.example.test'])
+	def test_other_port_on_callback_host_is_not_redirected(self):
+		# Cookies do not depend on the port, so the state is found on the callback.
+		response = self.start_on_host('inventory.example.test:8080')
+
+		self.assertTrue(response['Location'].startswith(f'{ISSUER}/authorize?'))
+
+	@override_settings(APP_URLS=[APP_URL], ALLOWED_HOSTS=['inventory.example.test', 'internal.example.test'])
+	def test_host_outside_app_urls_is_not_redirected(self):
+		# A proxy that rewrites the Host header would otherwise loop.
+		response = self.start_on_host('internal.example.test')
+
+		self.assertTrue(response['Location'].startswith(f'{ISSUER}/authorize?'))
+
+	@override_settings(
+		APP_URLS=[APP_URL, 'https://other.example.test'],
+		ALLOWED_HOSTS=['inventory.example.test', 'other.example.test'],
+		OIDC_REDIRECT_URI='https://other.example.test/api/oidc/callback/',
+	)
+	def test_explicit_redirect_uri_sets_the_login_host(self):
+		response = self.start_on_host('inventory.example.test')
+
+		self.assertEqual(response['Location'], 'https://other.example.test/api/oidc/authenticate/')
 
 	def test_unreachable_provider_fails_without_server_error(self):
 		with patch('requests.get', side_effect=requests.ConnectionError('down')):

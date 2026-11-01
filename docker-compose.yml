@@ -13,7 +13,7 @@ services:
       CREATE_INIT_ADMIN: ${CREATE_INIT_ADMIN:-true} # Set to false to disable initial administrator creation
       ENABLE_SIGNUP: ${ENABLE_SIGNUP:-false} # Set to true to enable public account signup
       SECRET_KEY: ${SECRET_KEY} # Set this to a random string for security purposes - You can generate one with `openssl rand -hex 32`
-      # Single sign-on via OpenID Connect (optional). Needs APP_URL (with APP_URLS only, the first entry counts); register ${APP_URL}/api/oidc/callback/ as redirect URI at your provider.
+      # Single sign-on via OpenID Connect (optional). Needs APP_URL (with APP_URLS only, the first entry counts); register ${APP_URL}/api/oidc/callback/ as redirect URI at your provider. SSO logins started on another APP_URLS host move to this host first, so users stay logged in there.
       #OIDC_ENABLED: ${OIDC_ENABLED:-false} # Set to true to show the single sign-on button on the login page
       #OIDC_ISSUER: ${OIDC_ISSUER} # Issuer URL of your provider (e.g. https://id.example.com) - endpoints are discovered from it
       #OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}

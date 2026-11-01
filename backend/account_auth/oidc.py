@@ -139,6 +139,21 @@ def get_callback_url(request):
     return request.build_absolute_uri(path)
 
 
+def get_canonical_login_url(request):
+    """Return the login URL on the callback host if the login started on another APP_URLS host.
+
+    The state lives in the session cookie of the host the login starts on, so the callback only finds
+    it on that host. Hosts outside APP_URL/APP_URLS are left alone: a proxy that rewrites the Host
+    header would otherwise be redirected in a loop.
+    """
+    callback = urlsplit(get_callback_url(request))
+    request_host = urlsplit(f"//{request.get_host()}").hostname
+    app_hosts = {urlsplit(url).hostname for url in [settings.APP_URL, *settings.APP_URLS] if url}
+    if request_host == callback.hostname or request_host not in app_hosts:
+        return None
+    return f"{callback.scheme}://{callback.netloc}{request.get_full_path()}"
+
+
 def require_https(url, name):
     """Provider URLs must use TLS (OpenID Connect Core 1.0, section 16.17), except on loopback or when allowed."""
     parsed = urlsplit(url)
@@ -455,6 +470,9 @@ class OIDCLoginView(OIDCAuthenticationRequestView):
     def get(self, request):
         if not oidc_enabled():
             raise Http404
+        canonical_url = get_canonical_login_url(request)
+        if canonical_url:
+            return HttpResponseRedirect(canonical_url)
         try:
             endpoint = get_endpoints()["OIDC_OP_AUTHORIZATION_ENDPOINT"]
         except LOGIN_ERRORS as exc:
