@@ -182,6 +182,8 @@ def get_provider_metadata():
     metadata = cache.get(cache_key)
     if metadata is None:
         metadata = provider_get(f"{issuer.rstrip('/')}/.well-known/openid-configuration", "OIDC discovery").json()
+        if not isinstance(metadata, dict):
+            raise OIDCConfigurationError("Discovery document must be a JSON object.")
         # OpenID Connect Discovery 1.0, section 4.3: the issuer must match exactly.
         if metadata.get("issuer") != issuer:
             raise OIDCConfigurationError(

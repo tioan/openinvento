@@ -298,6 +298,12 @@ class OIDCAuthenticationRequestTests(OIDCTestCase):
 		self.assertEqual(response.status_code, 302)
 		self.assertEqual(response['Location'], FAILURE_URL)
 
+	def test_non_object_discovery_document_fails_without_server_error(self):
+		answer_get = self.provider.answer_get
+		self.provider.answer_get = lambda url: FakeResponse([], url=url) if 'well-known' in url else answer_get(url)
+
+		self.assertEqual(self.client.get('/api/oidc/authenticate/')['Location'], FAILURE_URL)
+
 	def test_unreachable_provider_fails_without_server_error(self):
 		with patch('requests.get', side_effect=requests.ConnectionError('down')):
 			response = self.client.get('/api/oidc/authenticate/')
