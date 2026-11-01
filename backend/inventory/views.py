@@ -170,6 +170,9 @@ class InventoryScopedAPIView(APIView):
 # endregion Base classes
 
 # region Inventory Settings/ Management Views
+MANAGED_MEMBERS_ERROR = "Members of this inventory are managed by single sign-on."
+
+
 class InventoryMembersView(InventoryAccessMixin, APIView):
     """ API view for managing members of a specific inventory."""
     permission_classes = (IsAuthenticated, IsInventoryMember)
@@ -186,19 +189,24 @@ class InventoryMembersView(InventoryAccessMixin, APIView):
             "inventory": InventorySerializer(inventory).data,
             "members": UserSerializer(members, many=True).data,
             "available_users": UserSerializer(available_users, many=True).data,
-            "can_invite": settings.ALLOW_INVENTORY_USER_INVITES,
+            "can_invite": settings.ALLOW_INVENTORY_USER_INVITES and not inventory.oidc_managed,
         })
 
     def post(self, request, inventory_uuid):
         if not settings.ALLOW_INVENTORY_USER_INVITES:
             return Response({"error": "Inventory user invites are disabled."}, status=403)
         inventory = self.get_inventory(request, inventory_uuid)
+        if inventory.oidc_managed:
+            return Response({"error": MANAGED_MEMBERS_ERROR}, status=403)
         user = get_object_or_404(CustomUser, uuid=request.data.get("user_uuid"))
         inventory.users.add(user)
         return Response(UserSerializer(user).data, status=201)
 
     def delete(self, request, inventory_uuid, user_uuid):
         inventory = self.get_inventory(request, inventory_uuid)
+        # Also covers leaving: the next login would add the member again.
+        if inventory.oidc_managed:
+            return Response({"error": MANAGED_MEMBERS_ERROR}, status=403)
         user = get_object_or_404(CustomUser, uuid=user_uuid)
         inventory.users.remove(user)
 
@@ -229,6 +237,9 @@ class InventoryManageView(InventoryAccessMixin, APIView):
 
     def delete(self, request, inventory_uuid):
         inventory = self.get_inventory(request, inventory_uuid)
+        # Members have no roles, so any group member could delete a managed inventory for the whole group.
+        if inventory.oidc_managed and not request.user.is_superuser:
+            return Response({"error": "Only instance administrators can delete an inventory managed by single sign-on."}, status=403)
         inventory.delete()
         return Response(status=204)
 
