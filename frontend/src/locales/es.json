@@ -191,7 +191,9 @@
       "buttonWithProvider": "Iniciar sesión con {{provider}}",
       "divider": "o",
       "error": "El inicio de sesión único ha fallado. Inténtalo de nuevo o contacta con tu administrador.",
-      "redirecting": "Redirigiendo al inicio de sesión único..."
+      "redirecting": "Redirigiendo al inicio de sesión único...",
+      "configError": "No se pudieron cargar las opciones de inicio de sesión.",
+      "retry": "Reintentar"
     }
   },
   "boxes": {

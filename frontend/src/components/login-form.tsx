@@ -38,18 +38,33 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null)
   const [loginConfig, setLoginConfig] = useState<LoginConfig | null>(null)
   const [redirecting, setRedirecting] = useState(false)
+  const [configFailed, setConfigFailed] = useState(false)
+  const [configAttempt, setConfigAttempt] = useState(0)
 
   useEffect(() => {
+    // A response that arrives after a local login (or any unmount) must not start single sign-on.
+    let active = true
     getLoginConfig()
       .then((config) => {
+        if (!active) return
         setLoginConfig(config)
         if (config.oidc.enabled && config.oidc.auto_redirect && !ssoFailed && !forceLocalLogin && !loggedOut) {
           setRedirecting(true)
           startOIDCLogin()
         }
       })
-      .catch(() => undefined)
-  }, [ssoFailed, forceLocalLogin, loggedOut])
+      .catch(() => {
+        if (active) setConfigFailed(true)
+      })
+    return () => {
+      active = false
+    }
+  }, [ssoFailed, forceLocalLogin, loggedOut, configAttempt])
+
+  function retryLoginConfig() {
+    setConfigFailed(false)
+    setConfigAttempt((attempt) => attempt + 1)
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -110,6 +125,15 @@ export function LoginForm({
           </div>
 
           {ssoFailed && <FieldError>{t("auth.sso.error")}</FieldError>}
+
+          {configFailed && (
+            <Field>
+              <FieldError>{t("auth.sso.configError")}</FieldError>
+              <Button type="button" variant="outline" onClick={retryLoginConfig}>
+                {t("auth.sso.retry")}
+              </Button>
+            </Field>
+          )}
 
           {ssoEnabled && (
             <Field>

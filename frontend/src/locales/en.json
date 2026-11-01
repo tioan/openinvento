@@ -191,7 +191,9 @@
       "buttonWithProvider": "Sign in with {{provider}}",
       "divider": "or",
       "error": "Single sign-on failed. Please try again or contact your administrator.",
-      "redirecting": "Redirecting to single sign-on..."
+      "redirecting": "Redirecting to single sign-on...",
+      "configError": "The sign-in options could not be loaded.",
+      "retry": "Try again"
     }
   },
   "boxes": {

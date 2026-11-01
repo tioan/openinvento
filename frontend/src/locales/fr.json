@@ -191,7 +191,9 @@
       "buttonWithProvider": "Se connecter avec {{provider}}",
       "divider": "ou",
       "error": "L'authentification unique a échoué. Réessayez ou contactez votre administrateur.",
-      "redirecting": "Redirection vers l'authentification unique..."
+      "redirecting": "Redirection vers l'authentification unique...",
+      "configError": "Les options de connexion n'ont pas pu être chargées.",
+      "retry": "Réessayer"
     }
   },
   "boxes": {

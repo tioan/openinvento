@@ -191,7 +191,9 @@
       "buttonWithProvider": "Mit {{provider}} anmelden",
       "divider": "oder",
       "error": "Die Anmeldung per Single Sign-On ist fehlgeschlagen. Bitte versuche es erneut oder wende dich an deine Administration.",
-      "redirecting": "Weiterleitung zum Single Sign-On ..."
+      "redirecting": "Weiterleitung zum Single Sign-On ...",
+      "configError": "Die Anmeldeoptionen konnten nicht geladen werden.",
+      "retry": "Erneut versuchen"
     }
   },
   "boxes": {
