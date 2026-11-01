@@ -12,6 +12,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
 from django.contrib.auth import get_user
 from django.core.cache import cache
+from django.core.exceptions import SuspiciousOperation
 from django.http import HttpRequest
 from django.test import SimpleTestCase, TestCase, override_settings
 from mozilla_django_oidc.utils import generate_code_challenge
@@ -21,7 +22,7 @@ from rest_framework.test import APIClient
 from inventory.models import Inventory
 
 from .models import CustomUser, InstanceSettings, OIDCIdentity
-from .oidc import OIDCConfigurationError, provider_get
+from .oidc import OIDCBackend, OIDCConfigurationError, provider_get
 
 ISSUER = 'https://idp.example.test'
 CLIENT_ID = 'openinvento'
@@ -905,6 +906,15 @@ class OIDCHardeningTests(OIDCTestCase):
 			self.assert_login_failed(self.callback(params))
 
 		self.assertIn("Token algorithm 'HS256' does not match OIDC_SIGN_ALGO", logs.output[0])
+
+	def test_signature_check_rejects_other_algorithm_on_its_own(self):
+		# retrieve_matching_jwk rejects such tokens first; this check must hold without it.
+		backend = OIDCBackend()
+		backend.OIDC_RP_SIGN_ALGO = 'RS256'  # set per login in authenticate()
+		token = hs256_token(self.id_token_claims(), b'client-secret')
+
+		with self.assertRaisesMessage(SuspiciousOperation, "Token algorithm 'HS256' does not match OIDC_SIGN_ALGO"):
+			backend._verify_jws(token, b'client-secret')
 
 	@override_settings(OIDC_RP_SIGN_ALGO='none')
 	def test_unsupported_sign_algo_disables_oidc(self):
