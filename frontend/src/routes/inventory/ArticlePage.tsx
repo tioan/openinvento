@@ -430,6 +430,7 @@ export default function ArticlePage() {
                     </PopoverTrigger>
                     <PopoverContent align="start">
                       <PopoverDescription>{t("articles.page.fields.identifierHelp")}</PopoverDescription>
+                      <PopoverDescription>{t("manageCodes.identifierPrintedHint")}</PopoverDescription>
                     </PopoverContent>
                   </Popover>
                 </span>
